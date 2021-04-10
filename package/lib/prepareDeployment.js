@@ -17,7 +17,7 @@ module.exports = {
 
     const bucket = deploymentTemplate.resources.find(findDeploymentBucket);
 
-    const name = this.serverless.service.provider.deploymentBucketName;
+    const name = this.serverless.service.provider.bucket.name;
     const location = this.serverless.service.provider.region;
     const updatedBucket = updateBucket(bucket, name, location);
 

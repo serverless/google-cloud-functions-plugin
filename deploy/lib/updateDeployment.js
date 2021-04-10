@@ -15,16 +15,14 @@ module.exports = {
       project: this.serverless.service.provider.project,
     };
 
+    let name = `sls-${this.serverless.service.service}-${this.options.stage}`;
+    if (this.partial) {
+      name += '-partial';
+    }
+
     return this.provider
       .request('deploymentmanager', 'deployments', 'list', params)
-      .then((response) => {
-        const deployment = response.deployments.find((dep) => {
-          const name = `sls-${this.serverless.service.service}-${this.options.stage}`;
-          return dep.name === name;
-        });
-
-        return deployment;
-      });
+      .then((response) => response.deployments.find((dep) => dep.name === name));
   },
 
   update(deployment) {
@@ -36,11 +34,15 @@ module.exports = {
       'configuration-template-update.yml'
     );
 
-    const deploymentName = `sls-${this.serverless.service.service}-${this.options.stage}`;
+    let deploymentName = `sls-${this.serverless.service.service}-${this.options.stage}`;
+    if (this.partial) {
+      deploymentName += '-partial';
+    }
 
     const params = {
       project: this.serverless.service.provider.project,
       deployment: deploymentName,
+      deletePolicy: this.serverless.service.provider.deletePolicy || 'ABANDON',
       resource: {
         name: deploymentName,
         fingerprint: deployment.fingerprint,

@@ -20,11 +20,13 @@ module.exports = {
       .then((response) => {
         let foundDeployment;
 
+        let name = `sls-${this.serverless.service.service}-${this.options.stage}`;
+        if (this.partial) {
+          name += '-partial';
+        }
+
         if (response && response.deployments) {
-          foundDeployment = response.deployments.find((deployment) => {
-            const name = `sls-${this.serverless.service.service}-${this.options.stage}`;
-            return deployment.name === name;
-          });
+          foundDeployment = response.deployments.find((deployment) => deployment.name === name);
         }
 
         return foundDeployment;
@@ -42,7 +44,10 @@ module.exports = {
       'configuration-template-create.yml'
     );
 
-    const deploymentName = `sls-${this.serverless.service.service}-${this.options.stage}`;
+    let deploymentName = `sls-${this.serverless.service.service}-${this.options.stage}`;
+    if (this.partial) {
+      deploymentName += '-partial';
+    }
 
     const params = {
       project: this.serverless.service.provider.project,

@@ -29,7 +29,7 @@ module.exports = {
         funcObject,
         projectName,
         this.serverless.service.provider.region,
-        `gs://${this.serverless.service.provider.deploymentBucketName}/${this.serverless.service.package.artifactFilePath}`
+        `gs://${this.serverless.service.provider.bucket.name}/${this.serverless.service.package.artifactFilePath}`
       );
 
       funcTemplate.properties.serviceAccountEmail =

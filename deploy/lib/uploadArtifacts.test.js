@@ -21,7 +21,9 @@ describe('UploadArtifacts', () => {
     serverless.service = {
       service: 'my-service',
       provider: {
-        deploymentBucketName: 'sls-my-service-dev-12345678',
+        bucket: {
+          name: 'sls-my-service-dev-12345678',
+        },
       },
       package: {
         artifactFilePath: '/some-file-path',

@@ -22,7 +22,9 @@ describe('CompileFunctions', () => {
       compiledConfigurationTemplate: {
         resources: [],
       },
-      deploymentBucketName: 'sls-my-service-dev-12345678',
+      bucket: {
+        name: 'sls-my-service-dev-12345678',
+      },
       project: 'myProject',
       region: 'us-central1',
     };

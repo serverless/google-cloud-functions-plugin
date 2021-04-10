@@ -5,13 +5,20 @@ const _ = require('lodash');
 
 module.exports = {
   setDeploymentBucketName() {
-    // set a default name for the deployment bucket
+    const providerBucket = this.serverless.service.provider.bucket;
     const service = this.serverless.service.service;
     const stage = this.options.stage;
-    const timestamp = +new Date();
-    const name = `sls-${service}-${stage}-${timestamp}`;
 
-    this.serverless.service.provider.deploymentBucketName = name;
+    let providerBucketName = providerBucket && providerBucket.name;
+    if (!providerBucketName) {
+      const timestamp = +new Date();
+      providerBucketName = `sls-${service}-${stage}-${timestamp}`;
+    }
+
+    this.serverless.service.provider.bucket = {
+      ...providerBucket,
+      name: providerBucketName,
+    };
 
     // check if there's already a deployment and update if available
     const params = {
@@ -29,7 +36,7 @@ module.exports = {
             (resource) => resource.type === 'storage.v1.bucket' && resource.name.match(regex)
           );
 
-          this.serverless.service.provider.deploymentBucketName = deploymentBucket.name;
+          this.serverless.service.provider.bucket.name = deploymentBucket.name;
         }
       })
       .catch(() => BbPromise.resolve()); // if it cannot be found (e.g. on initial deployment)

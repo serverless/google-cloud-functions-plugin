@@ -9,7 +9,8 @@ module.exports = {
 
   getObjectsToRemove() {
     const params = {
-      bucket: this.serverless.service.provider.deploymentBucketName,
+      bucket:
+        this.serverless.service.provider.bucket && this.serverless.service.provider.bucket.name,
     };
 
     return this.provider.request('storage', 'objects', 'list', params).then((response) => {

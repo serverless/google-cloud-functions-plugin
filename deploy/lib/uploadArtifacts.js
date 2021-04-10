@@ -7,7 +7,7 @@ module.exports = {
     this.serverless.cli.log('Uploading artifacts...');
 
     const params = {
-      bucket: this.serverless.service.provider.deploymentBucketName,
+      bucket: this.serverless.service.provider.bucket.name,
       resource: {
         name: this.serverless.service.package.artifactFilePath,
         contentType: 'application/octet-stream',

@@ -29,6 +29,8 @@ class GoogleDeploy {
       cleanupDeploymentBucket
     );
 
+    this.partial = !!process.env.SELECTED_FUNCTIONS;
+
     this.hooks = {
       'before:deploy:deploy': () => BbPromise.bind(this).then(this.validate).then(this.setDefaults),
 
