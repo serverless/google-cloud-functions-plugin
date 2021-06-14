@@ -31,6 +31,15 @@ class GooglePackage {
         resource: {
           type: 'string',
         },
+        failurePolicy: {
+          type: 'object',
+          properties: {
+            retry: {
+              type: 'object',
+            },
+          },
+          additionalProperties: false,
+        },
       },
       required: ['eventType', 'resource'],
       additionalProperties: false,
