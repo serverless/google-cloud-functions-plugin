@@ -93,6 +93,50 @@ describe('CompileFunctions', () => {
       expect(() => googlePackage.compileFunctions()).toThrow(Error);
     });
 
+    it('should throw an error if the vpc connector property is invalid', () => {
+      googlePackage.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          memorySize: 128,
+          runtime: 'nodejs8',
+          vpc: 'project/pg-us-n-app-123456/locations/us-central1/connectors/my-vpc',
+          events: [{ http: 'foo' }],
+        },
+      };
+
+      expect(() => googlePackage.compileFunctions()).toThrow(Error);
+    });
+
+    it('should throw an error if the vpc connector egress property is invalid', () => {
+      googlePackage.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          memorySize: 128,
+          runtime: 'nodejs8',
+          vpc: 'projects/pg-us-n-app-123456/locations/us-central1/connectors/my-vpc',
+          egress: 'foo',
+          events: [{ http: 'foo' }],
+        },
+      };
+
+      expect(() => googlePackage.compileFunctions()).toThrow(Error);
+    });
+
+    it('should throw an error if the vpc connector ingress property is invalid', () => {
+      googlePackage.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          memorySize: 128,
+          runtime: 'nodejs8',
+          vpc: 'projects/pg-us-n-app-123456/locations/us-central1/connectors/my-vpc',
+          ingress: 'foo',
+          events: [{ http: 'foo' }],
+        },
+      };
+
+      expect(() => googlePackage.compileFunctions()).toThrow(Error);
+    });
+
     it('should set the memory size based on the functions configuration', () => {
       googlePackage.serverless.service.functions = {
         func1: {
@@ -646,6 +690,90 @@ describe('CompileFunctions', () => {
             },
             labels: {},
             vpcConnector: 'projects/pg-us-n-app-123456/locations/us-central1/connectors/my-vpc',
+          },
+        },
+      ];
+
+      return googlePackage.compileFunctions().then(() => {
+        expect(consoleLogStub.called).toEqual(true);
+        expect(
+          googlePackage.serverless.service.provider.compiledConfigurationTemplate.resources
+        ).toEqual(compiledResources);
+      });
+    });
+
+    it('should set vpc egress on the function configuration', () => {
+      googlePackage.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          memorySize: 128,
+          runtime: 'nodejs8',
+          vpc: 'projects/pg-us-n-app-123456/locations/us-central1/connectors/my-vpc',
+          egress: 'ALL_TRAFFIC',
+          events: [{ http: 'foo' }],
+        },
+      };
+
+      const compiledResources = [
+        {
+          type: 'gcp-types/cloudfunctions-v1:projects.locations.functions',
+          name: 'my-service-dev-func1',
+          properties: {
+            parent: 'projects/myProject/locations/us-central1',
+            runtime: 'nodejs8',
+            function: 'my-service-dev-func1',
+            entryPoint: 'func1',
+            availableMemoryMb: 128,
+            timeout: '60s',
+            sourceArchiveUrl: 'gs://sls-my-service-dev-12345678/some-path/artifact.zip',
+            httpsTrigger: {
+              url: 'foo',
+            },
+            labels: {},
+            vpcConnector: 'projects/pg-us-n-app-123456/locations/us-central1/connectors/my-vpc',
+            vpcConnectorEgressSettings: 'ALL_TRAFFIC',
+          },
+        },
+      ];
+
+      return googlePackage.compileFunctions().then(() => {
+        expect(consoleLogStub.called).toEqual(true);
+        expect(
+          googlePackage.serverless.service.provider.compiledConfigurationTemplate.resources
+        ).toEqual(compiledResources);
+      });
+    });
+
+    it('should set vpc ingress on the function configuration', () => {
+      googlePackage.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          memorySize: 128,
+          runtime: 'nodejs8',
+          vpc: 'projects/pg-us-n-app-123456/locations/us-central1/connectors/my-vpc',
+          ingress: 'ALLOW_ALL',
+          events: [{ http: 'foo' }],
+        },
+      };
+
+      const compiledResources = [
+        {
+          type: 'gcp-types/cloudfunctions-v1:projects.locations.functions',
+          name: 'my-service-dev-func1',
+          properties: {
+            parent: 'projects/myProject/locations/us-central1',
+            runtime: 'nodejs8',
+            function: 'my-service-dev-func1',
+            entryPoint: 'func1',
+            availableMemoryMb: 128,
+            timeout: '60s',
+            sourceArchiveUrl: 'gs://sls-my-service-dev-12345678/some-path/artifact.zip',
+            httpsTrigger: {
+              url: 'foo',
+            },
+            labels: {},
+            vpcConnector: 'projects/pg-us-n-app-123456/locations/us-central1/connectors/my-vpc',
+            ingressSettings: 'ALLOW_ALL',
           },
         },
       ];
