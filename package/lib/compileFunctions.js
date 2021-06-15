@@ -57,6 +57,18 @@ module.exports = {
         });
       }
 
+      if (funcObject.egress) {
+        _.assign(funcTemplate.properties, {
+          vpcConnectorEgressSettings: _.get(funcObject, 'egress') || _.get(this, 'serverless.service.provider.egress'),
+        });
+      }
+
+      if (funcObject.ingress) {
+        _.assign(funcTemplate.properties, {
+          ingressSettings: _.get(funcObject, 'ingress') || _.get(this, 'serverless.service.provider.ingress'),
+        });
+      }
+
       if (funcObject.maxInstances) {
         funcTemplate.properties.maxInstances = funcObject.maxInstances;
       }
@@ -115,6 +127,46 @@ const validateVpcConnectorProperty = (funcObject, functionName) => {
       const errorMessage = [
         `The function "${functionName}" has invalid vpc connection name`,
         ' VPC Connector name should follow projects/{project_id}/locations/{region}/connectors/{connector_name}',
+        ' Please check the docs for more info.',
+      ].join('');
+      throw new Error(errorMessage);
+    }
+  }
+};
+
+/**
+ * Validate the function egress settings per
+ * https://cloud.google.com/functions/docs/reference/rest/v1/projects.locations.functions#vpcconnectoregresssettings
+ * @param {*} funcObject
+ * @param {*} functionName
+ */
+const validateVpcEgressProperty = (funcObject, functionName) => {
+  if (funcObject.egress && typeof funcObject.egress === 'string') {
+    const validTypes = ['VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED', 'PRIVATE_RANGES_ONLY', 'ALL_TRAFFIC'];
+    if (!validTypes.includes(funcObject.egress)) {
+      const errorMessage = [
+        `The function "${functionName}" has an invalid egress setting`,
+        ' Egress setting should be ALL_TRAFFIC, PRIVATE_RANGES_ONLY or VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED',
+        ' Please check the docs for more info.',
+      ].join('');
+      throw new Error(errorMessage);
+    }
+  }
+};
+
+/**
+ * Validate the function ingress settings per
+ * https://cloud.google.com/functions/docs/reference/rest/v1/projects.locations.functions#ingresssettings
+ * @param {*} funcObject
+ * @param {*} functionName
+ */
+const validateVpcIngressProperty = (funcObject, functionName) => {
+  if (funcObject.ingress && typeof funcObject.ingress === 'string') {
+    const validTypes = ['INGRESS_SETTINGS_UNSPECIFIED', 'ALLOW_ALL', 'ALLOW_INTERNAL_ONLY', 'ALLOW_INTERNAL_AND_GCLB'];
+    if (!validTypes.includes(funcObject.ingress)) {
+      const errorMessage = [
+        `The function "${functionName}" has an invalid ingress setting`,
+        ' Ingress setting should be ALLOW_ALL, ALLOW_INTERNAL_ONLY, ALLOW_INTERNAL_AND_GCLB or INGRESS_SETTINGS_UNSPECIFIED',
         ' Please check the docs for more info.',
       ].join('');
       throw new Error(errorMessage);
