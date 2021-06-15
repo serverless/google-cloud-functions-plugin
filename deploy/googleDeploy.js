@@ -10,6 +10,7 @@ const monitorDeployment = require('../shared/monitorDeployment');
 const uploadArtifacts = require('./lib/uploadArtifacts');
 const updateDeployment = require('./lib/updateDeployment');
 const cleanupDeploymentBucket = require('./lib/cleanupDeploymentBucket');
+const setIamPolicy = require('./lib/setIamPolicy');
 
 class GoogleDeploy {
   constructor(serverless, options) {
@@ -26,7 +27,8 @@ class GoogleDeploy {
       monitorDeployment,
       uploadArtifacts,
       updateDeployment,
-      cleanupDeploymentBucket
+      cleanupDeploymentBucket,
+      setIamPolicy
     );
 
     this.hooks = {
@@ -37,7 +39,8 @@ class GoogleDeploy {
           .then(this.createDeployment)
           .then(this.setDeploymentBucketName)
           .then(this.uploadArtifacts)
-          .then(this.updateDeployment),
+          .then(this.updateDeployment)
+          .then(this.setIamPolicy),
 
       'after:deploy:deploy': () => BbPromise.bind(this).then(this.cleanupDeploymentBucket),
     };

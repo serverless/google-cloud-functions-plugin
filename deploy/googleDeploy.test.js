@@ -43,6 +43,7 @@ describe('GoogleDeploy', () => {
       let uploadArtifactsStub;
       let updateDeploymentStub;
       let cleanupDeploymentBucketStub;
+      let setIamPolicyStub;
 
       beforeEach(() => {
         validateStub = sinon.stub(googleDeploy, 'validate').returns(BbPromise.resolve());
@@ -62,6 +63,7 @@ describe('GoogleDeploy', () => {
         cleanupDeploymentBucketStub = sinon
           .stub(googleDeploy, 'cleanupDeploymentBucket')
           .returns(BbPromise.resolve());
+        setIamPolicyStub = sinon.stub(googleDeploy, 'setIamPolicy').returns(BbPromise.resolve());
       });
 
       afterEach(() => {
@@ -72,6 +74,7 @@ describe('GoogleDeploy', () => {
         googleDeploy.uploadArtifacts.restore();
         googleDeploy.updateDeployment.restore();
         googleDeploy.cleanupDeploymentBucket.restore();
+        googleDeploy.setIamPolicy.restore();
       });
 
       it('should run "before:deploy:deploy" promise chain', () =>
@@ -86,6 +89,7 @@ describe('GoogleDeploy', () => {
           expect(setDeploymentBucketNameStub.calledAfter(createDeploymentStub)).toEqual(true);
           expect(uploadArtifactsStub.calledAfter(createDeploymentStub)).toEqual(true);
           expect(updateDeploymentStub.calledAfter(uploadArtifactsStub)).toEqual(true);
+          expect(setIamPolicyStub.calledAfter(updateDeploymentStub)).toEqual(true);
         }));
 
       it('should run "after:deploy:deploy" promise chain', () =>

@@ -27,6 +27,10 @@ module.exports = {
 
     this.serverless.service.provider.compiledConfigurationTemplate = deploymentTemplate;
 
+    // functionIamBindings holds a mapping of function name to array of bindings which
+    // were configured for it. This is populated during function compile.
+    this.serverless.service.provider.functionIamBindings = {};
+
     return BbPromise.resolve();
   },
 };

@@ -46,7 +46,8 @@
     "fs-extra": "^8.1.0",
     "get-stdin": "^8.0.0",
     "googleapis": "^50.0.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "serverless": "^2.41.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^9.1.2",
