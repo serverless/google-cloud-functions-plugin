@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/serverless/serverless-google-cloudfunctions/compare/v4.1.0...v4.2.0) (2021-06-17)
+
+### Features
+
+- Add support for http events in invoke local ([#264](https://github.com/serverless/serverless-google-cloudfunctions/issues/264)) ([446d161](https://github.com/serverless/serverless-google-cloudfunctions/commit/446d161a3ddff8e3eaed41af0f9e415726cd23dd)) ([Corentin Doue](https://github.com/CorentinDoue))
+
 ## [4.1.0](https://github.com/serverless/serverless-google-cloudfunctions/compare/v4.0.0...v4.1.0) (2021-06-07)
 
 ### Features
