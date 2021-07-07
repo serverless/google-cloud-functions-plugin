@@ -507,6 +507,143 @@ describe('CompileFunctions', () => {
       });
     });
 
+    it('should set the build environment variables based on the function configuration', () => {
+      googlePackage.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          buildEnvironment: {
+            TEST_VAR: 'test',
+          },
+          events: [{ http: 'foo' }],
+        },
+      };
+
+      const compiledResources = [
+        {
+          type: 'gcp-types/cloudfunctions-v1:projects.locations.functions',
+          name: 'my-service-dev-func1',
+          properties: {
+            parent: 'projects/myProject/locations/us-central1',
+            runtime: 'nodejs10',
+            function: 'my-service-dev-func1',
+            entryPoint: 'func1',
+            availableMemoryMb: 256,
+            buildEnvironmentVariables: {
+              TEST_VAR: 'test',
+            },
+            timeout: '60s',
+            sourceArchiveUrl: 'gs://sls-my-service-dev-12345678/some-path/artifact.zip',
+            httpsTrigger: {
+              url: 'foo',
+            },
+            labels: {},
+          },
+        },
+      ];
+
+      return googlePackage.compileFunctions().then(() => {
+        expect(consoleLogStub.calledOnce).toEqual(true);
+        expect(
+          googlePackage.serverless.service.provider.compiledConfigurationTemplate.resources
+        ).toEqual(compiledResources);
+      });
+    });
+
+    it('should set the build environment variables based on the provider configuration', () => {
+      googlePackage.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          events: [{ http: 'foo' }],
+        },
+      };
+      googlePackage.serverless.service.provider.buildEnvironment = {
+        TEST_VAR: 'test',
+      };
+
+      const compiledResources = [
+        {
+          type: 'gcp-types/cloudfunctions-v1:projects.locations.functions',
+          name: 'my-service-dev-func1',
+          properties: {
+            parent: 'projects/myProject/locations/us-central1',
+            runtime: 'nodejs10',
+            function: 'my-service-dev-func1',
+            entryPoint: 'func1',
+            availableMemoryMb: 256,
+            buildEnvironmentVariables: {
+              TEST_VAR: 'test',
+            },
+            timeout: '60s',
+            sourceArchiveUrl: 'gs://sls-my-service-dev-12345678/some-path/artifact.zip',
+            httpsTrigger: {
+              url: 'foo',
+            },
+            labels: {},
+          },
+        },
+      ];
+
+      return googlePackage.compileFunctions().then(() => {
+        expect(consoleLogStub.calledOnce).toEqual(true);
+        expect(
+          googlePackage.serverless.service.provider.compiledConfigurationTemplate.resources
+        ).toEqual(compiledResources);
+      });
+    });
+
+    it('should merge the build environment variables on the provider configuration and function definition', () => {
+      googlePackage.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          buildEnvironment: {
+            TEST_VAR: 'test_var',
+            TEST_VALUE: 'foobar',
+          },
+          events: [{ http: 'foo' }],
+        },
+      };
+      googlePackage.serverless.service.provider.buildEnvironment = {
+        TEST_VAR: 'test',
+        TEST_FOO: 'foo',
+      };
+
+      const compiledResources = [
+        {
+          type: 'gcp-types/cloudfunctions-v1:projects.locations.functions',
+          name: 'my-service-dev-func1',
+          properties: {
+            parent: 'projects/myProject/locations/us-central1',
+            runtime: 'nodejs10',
+            function: 'my-service-dev-func1',
+            entryPoint: 'func1',
+            availableMemoryMb: 256,
+            buildEnvironmentVariables: {
+              TEST_VAR: 'test_var',
+              TEST_VALUE: 'foobar',
+              TEST_FOO: 'foo',
+            },
+            timeout: '60s',
+            sourceArchiveUrl: 'gs://sls-my-service-dev-12345678/some-path/artifact.zip',
+            httpsTrigger: {
+              url: 'foo',
+            },
+            labels: {},
+          },
+        },
+      ];
+
+      return googlePackage.compileFunctions().then(() => {
+        expect(consoleLogStub.calledOnce).toEqual(true);
+        expect(
+          googlePackage.serverless.service.provider.compiledConfigurationTemplate.resources
+        ).toEqual(compiledResources);
+        expect(googlePackage.serverless.service.provider.buildEnvironment).toEqual({
+          TEST_VAR: 'test',
+          TEST_FOO: 'foo',
+        });
+      });
+    });
+
     it('should compile "http" events properly', () => {
       googlePackage.serverless.service.functions = {
         func1: {
