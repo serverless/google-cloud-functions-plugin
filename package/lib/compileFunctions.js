@@ -46,6 +46,8 @@ module.exports = {
         _.get(funcObject, 'timeout') || _.get(this, 'serverless.service.provider.timeout') || '60s';
       funcTemplate.properties.environmentVariables =
         this.provider.getConfiguredEnvironment(funcObject);
+      funcTemplate.properties.buildEnvironmentVariables =
+        this.provider.getConfiguredBuildEnvironment(funcObject);
 
       if (!funcTemplate.properties.serviceAccountEmail) {
         delete funcTemplate.properties.serviceAccountEmail;
@@ -63,6 +65,9 @@ module.exports = {
 
       if (!_.size(funcTemplate.properties.environmentVariables)) {
         delete funcTemplate.properties.environmentVariables;
+      }
+      if (!_.size(funcTemplate.properties.buildEnvironmentVariables)) {
+        delete funcTemplate.properties.buildEnvironmentVariables;
       }
 
       funcTemplate.properties.labels = _.assign(

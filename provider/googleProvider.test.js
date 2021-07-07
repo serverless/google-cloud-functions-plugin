@@ -230,4 +230,41 @@ describe('GoogleProvider', () => {
       );
     });
   });
+
+  describe('#getConfiguredBuildEnvironment()', () => {
+    const functionBuildEnvironment = {
+      MY_VAR: 'myVarFunctionValue',
+      FUNCTION_VAR: 'functionVarFunctionValue',
+    };
+    const providerBuildEnvironment = {
+      MY_VAR: 'myVarProviderValue',
+      PROVIDER_VAR: 'providerVarProviderValue',
+    };
+
+    it('should return the build environment of the function if defined', () => {
+      expect(
+        googleProvider.getConfiguredBuildEnvironment({ buildEnvironment: functionBuildEnvironment })
+      ).toEqual(functionBuildEnvironment);
+    });
+
+    it('should return the build environment of the provider if defined', () => {
+      serverless.service.provider.buildEnvironment = providerBuildEnvironment;
+      expect(googleProvider.getConfiguredBuildEnvironment({})).toEqual(providerBuildEnvironment);
+    });
+
+    it('should return an empty object if neither the build environment of the function nor the one of the provider are defined', () => {
+      expect(googleProvider.getConfiguredBuildEnvironment({})).toEqual({});
+    });
+
+    it('should return the merged build environment of the provider and the function. The function override the provider.', () => {
+      serverless.service.provider.buildEnvironment = providerBuildEnvironment;
+      expect(
+        googleProvider.getConfiguredBuildEnvironment({ buildEnvironment: functionBuildEnvironment })
+      ).toEqual({
+        MY_VAR: 'myVarFunctionValue',
+        FUNCTION_VAR: 'functionVarFunctionValue',
+        PROVIDER_VAR: 'providerVarProviderValue',
+      });
+    });
+  });
 });
